@@ -1,0 +1,3 @@
+# Documentation
+
+![](./diagram.drawio.svg)
