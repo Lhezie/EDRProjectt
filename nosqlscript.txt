@@ -1,0 +1,79 @@
+Create Entities
+
+// Create Users Collection
+db.Users.insertMany([
+    { user_id: 1, name: "Alice", email: "alice@example.com", role: "admin" },
+    { user_id: 2, name: "Bob", email: "bob@example.com", role: "user" }
+]);
+
+// Create Categories Collection
+db.Categories.insertMany([
+    { category_id: 1, name: "Electronics", description: "Electronic gadgets and devices" },
+    { category_id: 2, name: "Clothing", description: "Apparel and clothing items" }
+]);
+
+// Create Items Collection
+db.Items.insertMany([
+    { item_id: 1, name: "Laptop", price: 999.99, size: "medium", category_id: 1 },
+    { item_id: 2, name: "T-Shirt", price: 19.99, size: "small", category_id: 2 }
+]);
+
+// Create Orders Collection
+db.Orders.insertMany([
+    { order_id: 1, user_id: 2, item_id: 1, quantity: 1, status: "Pending" },
+    { order_id: 2, user_id: 2, item_id: 2, quantity: 2, status: "Pending" }
+]);
+
+
+Query Records
+
+// Fetch items with their categories
+db.Items.aggregate([
+    { $lookup: {
+        from: "Categories",
+        localField: "category_id",
+        foreignField: "category_id",
+        as: "category_details"
+    }}
+]);
+
+// Fetch orders with user and item details
+db.Orders.aggregate([
+    { $lookup: {
+        from: "Users",
+        localField: "user_id",
+        foreignField: "user_id",
+        as: "user_details"
+    }},
+    { $lookup: {
+        from: "Items",
+        localField: "item_id",
+        foreignField: "item_id",
+        as: "item_details"
+    }}
+]);
+
+
+
+Update Records
+
+// Update item price and size
+db.Items.updateOne(
+    { name: "Laptop" },
+    { $set: { price: 1099.99, size: "large" } }
+);
+
+// Update order status
+db.Orders.updateOne(
+    { order_id: 1 },
+    { $set: { status: "Approved" } }
+);
+
+
+Delete Records
+
+// Delete a specific order
+db.Orders.deleteOne({ order_id: 2 });
+
+// Delete a category (and manually delete dependent items if necessary)
+db.Categories.deleteOne({ category_id: 1 });

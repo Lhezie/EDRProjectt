@@ -1,0 +1,103 @@
+SQL Script
+Create the Entities
+
+CREATE TABLE Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    role ENUM('admin', 'user') NOT NULL
+);
+
+CREATE TABLE Categories (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT
+);
+
+CREATE TABLE Items (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    size ENUM('small', 'medium', 'large') NOT NULL,
+    category_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES Categories(category_id)
+);
+
+CREATE TABLE Orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    item_id INT,
+    quantity INT NOT NULL,
+    status ENUM('Pending', 'Approved', 'Disapproved') DEFAULT 'Pending',
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (item_id) REFERENCES Items(item_id)
+);
+
+
+Insert Records
+
+-- Insert Users
+INSERT INTO Users (name, email, role) VALUES
+('Alice', 'alice@example.com', 'admin'),
+('Bob', 'bob@example.com', 'user');
+
+-- Insert Categories
+INSERT INTO Categories (name, description) VALUES
+('Electronics', 'Electronic gadgets and devices'),
+('Clothing', 'Apparel and clothing items');
+
+-- Insert Items
+INSERT INTO Items (name, price, size, category_id) VALUES
+('Laptop', 999.99, 'medium', 1),
+('T-Shirt', 19.99, 'small', 2);
+
+-- Insert Orders
+INSERT INTO Orders (user_id, item_id, quantity, status) VALUES
+(2, 1, 1, 'Pending'),
+(2, 2, 2, 'Pending');
+
+
+
+Query Records
+
+-- Fetch all items with their categories
+SELECT i.name AS item_name, c.name AS category_name
+FROM Items i
+JOIN Categories c ON i.category_id = c.category_id;
+
+-- Fetch all orders with user and item details
+SELECT o.order_id, u.name AS user_name, i.name AS item_name, o.quantity, o.status
+FROM Orders o
+JOIN Users u ON o.user_id = u.user_id
+JOIN Items i ON o.item_id = i.item_id;
+
+
+
+Update Records
+
+-- Fetch all items with their categories
+SELECT i.name AS item_name, c.name AS category_name
+FROM Items i
+JOIN Categories c ON i.category_id = c.category_id;
+
+-- Fetch all orders with user and item details
+SELECT o.order_id, u.name AS user_name, i.name AS item_name, o.quantity, o.status
+FROM Orders o
+JOIN Users u ON o.user_id = u.user_id
+JOIN Items i ON o.item_id = i.item_id;
+
+
+Delete Records
+
+-- Delete a specific order
+DELETE FROM Orders WHERE order_id = 2;
+
+-- Delete a category (cascade effect deletes dependent items)
+DELETE FROM Categories WHERE category_id = 1;
+
+
+
+
